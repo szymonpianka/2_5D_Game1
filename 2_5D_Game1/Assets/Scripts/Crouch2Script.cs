@@ -4,28 +4,26 @@ using UnityEngine;
 
 public class Crouch2Script : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private CapsuleCollider2D col;
+    private CharacterController controller;
 
     // Variables for crouching
-    private Vector2 originalOffset;
-    private Vector2 originalSize;
-    private Vector2 crouchOffset;
-    private Vector2 crouchSize;
+    private float originalHeight;
+    private Vector3 originalCenter;
+    private float crouchHeight;
+    private Vector3 crouchCenter;
     private bool isCrouching = false;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        col = GetComponent<CapsuleCollider2D>();
+        controller = GetComponent<CharacterController>();
 
-        // Store the original size and offset of the collider
-        originalOffset = col.offset;
-        originalSize = col.size;
-        
-        // Define the size and offset of the collider when crouching (1/4 of the original height)
-        crouchSize = new Vector2(col.size.x, col.size.y / 4);
-        crouchOffset = new Vector2(col.offset.x, col.offset.y - (originalSize.y - crouchSize.y) / 2);
+        // Store the original height and center of the controller
+        originalHeight = controller.height;
+        originalCenter = controller.center;
+
+        // Define the height and center of the controller when crouching (half of the original height)
+        crouchHeight = originalHeight / 2;
+        crouchCenter = originalCenter - new Vector3(0, (originalHeight - crouchHeight) / 2, 0);
     }
 
     void Update()
@@ -35,7 +33,7 @@ public class Crouch2Script : MonoBehaviour
         {
             Crouch();
         }
-        
+
         // Check if the left Ctrl key is released
         if (Input.GetKeyUp(KeyCode.LeftControl))
         {
@@ -47,9 +45,9 @@ public class Crouch2Script : MonoBehaviour
     {
         if (!isCrouching)
         {
-            // Reduce the collider size and adjust the offset for crouching
-            col.size = crouchSize;
-            col.offset = crouchOffset;
+            // Reduce the controller height and adjust the center for crouching
+            controller.height = crouchHeight;
+            controller.center = crouchCenter;
             isCrouching = true;
         }
     }
@@ -58,15 +56,12 @@ public class Crouch2Script : MonoBehaviour
     {
         if (isCrouching)
         {
-            // Restore the original collider size and offset
-            col.size = originalSize;
-            col.offset = originalOffset;
+            // Restore the original controller height and center
+            controller.height = originalHeight;
+            controller.center = originalCenter;
             isCrouching = false;
         }
     }
-    
-
-
     
 
    

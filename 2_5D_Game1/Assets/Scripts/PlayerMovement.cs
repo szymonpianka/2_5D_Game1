@@ -7,7 +7,10 @@ public class PlayerMovement : MonoBehaviour
     public float maximumSpeed;
     public float rotationSpeed;
 
-    public float jumpSpeed;
+    public float jumpHeight; //jumpSpeed
+
+    [SerializeField]
+    private float gravityMultiplier;
 
     [SerializeField]
     private float jumpHorizontalSpeed;
@@ -23,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isJumping;
     private bool isGrounded;
 
+    [SerializeField] // Użyj [SerializeField], aby przypisać to pole w inspektorze Unity
+    private DragObjectScript dragObjectScript;
 
     // Start is called before the first frame update
     void Start()
@@ -30,38 +35,39 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
-        
     }
 
     // Update is called once per frame
     void Update()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
 
-        Vector3 movementDirection = new Vector3(horizontalInput, 0, verticalInput);
+        Vector3 movementDirection = new Vector3(horizontalInput, 0);
         float inputMagnitude = Mathf.Clamp01(movementDirection.magnitude);
 
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
             inputMagnitude /= 2;
-
         }
         animator.SetFloat("Input Magnitude", inputMagnitude, 0.05f, Time.deltaTime);
         movementDirection.Normalize();
 
-        ySpeed += Physics.gravity.y * Time.deltaTime;
+        float gravity = Physics.gravity.y * gravityMultiplier;
+
+        if (isJumping && ySpeed > 0 && Input.GetButton("Jump") == false)
+        {
+            gravity *= 2;
+        }
+        ySpeed += gravity * Time.deltaTime;
 
         if (characterController.isGrounded)
         {
             lastGroundedTime = Time.time;
-
         }
 
         if (Input.GetButtonDown("Jump"))
         {
             jumpButtonPressedTime = Time.time;
-
         }
 
         if (Time.time - lastGroundedTime <= jumpButtonGracePeriod)
@@ -74,15 +80,15 @@ public class PlayerMovement : MonoBehaviour
             isJumping = false;
             animator.SetBool("IsFalling", false);
 
-            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod)
+            // Sprawdzenie wartości isDragging z DragObjectScript
+            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && dragObjectScript != null && !dragObjectScript.isDragging)
             {
-                ySpeed = jumpSpeed;
+                ySpeed = Mathf.Sqrt(jumpHeight * -3 * gravity);
                 animator.SetBool("IsJumping", true);
                 isJumping = true;
                 jumpButtonPressedTime = null;
                 lastGroundedTime = null;
             }
-
         }
         else
         {
@@ -94,14 +100,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 animator.SetBool("IsFalling", true);
             }
-
         }
-
-        
-
-        
-
-        
 
         if (movementDirection != Vector3.zero)
         {
@@ -109,13 +108,10 @@ public class PlayerMovement : MonoBehaviour
             Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
 
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
-            
         }
         else
         {
             animator.SetBool("IsMoving", false);
-
-
         }
 
         if (isGrounded == false)
@@ -125,7 +121,6 @@ public class PlayerMovement : MonoBehaviour
 
             characterController.Move(velocity * Time.deltaTime);
         }
-        
     }
 
     private void OnAnimatorMove()
@@ -136,10 +131,7 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = ySpeed * Time.deltaTime;
 
             characterController.Move(velocity);
-            
         }
-        
-
     }
 
 }
