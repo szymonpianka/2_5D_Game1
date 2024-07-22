@@ -11,10 +11,12 @@ public class Crouch2Script : MonoBehaviour
     private Vector3 originalCenter;
     private float crouchHeight;
     private Vector3 crouchCenter;
-    private bool isCrouching = false;
+    public bool isCrouching = false;
+    private Animator animator;
 
     void Start()
     {
+        animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
 
         // Store the original height and center of the controller
@@ -31,12 +33,15 @@ public class Crouch2Script : MonoBehaviour
         // Check if the left Ctrl key is pressed
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
+            animator.SetBool("IsCrawling", true);
+            Debug.Log("ISCrawling true");
             Crouch();
         }
 
         // Check if the left Ctrl key is released
         if (Input.GetKeyUp(KeyCode.LeftControl))
         {
+             animator.SetBool("IsCrawling", false);
             StandUp();
         }
     }
@@ -62,6 +67,8 @@ public class Crouch2Script : MonoBehaviour
             isCrouching = false;
         }
     }
+
+    
     
 
    

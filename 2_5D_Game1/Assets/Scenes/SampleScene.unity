@@ -405,6 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 852532069757fbb4d972bbb4d9838ce2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isCrouching: 0
 --- !u!114 &193610458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,6 +425,7 @@ MonoBehaviour:
   jumpHorizontalSpeed: 0
   jumpButtonGracePeriod: 0.2
   dragObjectScript: {fileID: 0}
+  crouch2Script: {fileID: 0}
 --- !u!143 &193610463
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1825,6 +1827,7 @@ MonoBehaviour:
   jumpHorizontalSpeed: 3
   jumpButtonGracePeriod: 0.01
   dragObjectScript: {fileID: 359251011}
+  crouch2Script: {fileID: 1693928540}
 --- !u!4 &1693928538 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: db66305c0b69d8f4a990d68b0fc5b7db,
@@ -1864,6 +1867,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 852532069757fbb4d972bbb4d9838ce2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isCrouching: 0
 --- !u!1 &1711798686
 GameObject:
   m_ObjectHideFlags: 3

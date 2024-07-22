@@ -26,8 +26,11 @@ public class PlayerMovement : MonoBehaviour
     private bool isJumping;
     private bool isGrounded;
 
-    [SerializeField] // Użyj [SerializeField], aby przypisać to pole w inspektorze Unity
+    [SerializeField] // Użyj [SerializeField], aby przypisać te pola w inspektorze Unity
     private DragObjectScript dragObjectScript;
+
+    [SerializeField]
+    private Crouch2Script crouch2Script; // Dodaj referencję do skryptu Crouch2Script
 
     // Start is called before the first frame update
     void Start()
@@ -80,8 +83,8 @@ public class PlayerMovement : MonoBehaviour
             isJumping = false;
             animator.SetBool("IsFalling", false);
 
-            // Sprawdzenie wartości isDragging z DragObjectScript
-            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && dragObjectScript != null && !dragObjectScript.isDragging)
+            // Sprawdzenie wartości isDragging i isCrawling
+            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && dragObjectScript != null && !dragObjectScript.isDragging && crouch2Script != null && !crouch2Script.isCrouching)
             {
                 ySpeed = Mathf.Sqrt(jumpHeight * -3 * gravity);
                 animator.SetBool("IsJumping", true);
