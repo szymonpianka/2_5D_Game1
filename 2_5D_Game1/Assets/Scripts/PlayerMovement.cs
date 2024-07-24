@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public bool disabled = false; //TELEPORT
     public float maximumSpeed;
     public float rotationSpeed;
 
@@ -43,7 +44,9 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
+        if(!disabled)
+        {
+            float horizontalInput = Input.GetAxis("Horizontal");
 
         Vector3 movementDirection = new Vector3(horizontalInput, 0);
         float inputMagnitude = Mathf.Clamp01(movementDirection.magnitude);
@@ -124,8 +127,11 @@ public class PlayerMovement : MonoBehaviour
 
             characterController.Move(velocity * Time.deltaTime);
         }
-    }
+        }
 
+    
+
+    }
     private void OnAnimatorMove()
     {
         if (isGrounded)
@@ -136,5 +142,6 @@ public class PlayerMovement : MonoBehaviour
             characterController.Move(velocity);
         }
     }
+        
 
 }
