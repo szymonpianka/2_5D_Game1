@@ -8,25 +8,47 @@ public class Climbing_v3 : MonoBehaviour
     public float horizontalOffset = 1.0f; // Wartość przesunięcia w bok
     public float verticalOffset = 1.0f; // Wartość przesunięcia w górę
     public List<GameObject> triggerObjects; // Lista obiektów, które aktywują przesunięcie
+    public GameObject teleportTarget; // Obiekt, do którego gracz się teleportuje
+    private Animator animator;
+
     PlayerMovement playerController;
 
     // Start is called before the first frame update
     void Start()
     {
+        animator = GetComponent<Animator>();
         playerController = gameObject.GetComponent<PlayerMovement>();
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (triggerObjects.Contains(other.gameObject))
+        // Sprawdzenie, czy IsFalling jest false w animatorze
+        if (!animator.GetBool("IsFalling") && triggerObjects.Contains(other.gameObject))
         {
-            StartCoroutine(MoveByOffset());
+            animator.SetBool("IsClimbing", true);
+            StartCoroutine(TeleportAndMove());
         }
     }
 
-    IEnumerator MoveByOffset()
+    IEnumerator TeleportAndMove()
     {
+        // Wyłączenie sterowania graczem
         playerController.disabled = true;
+
+        // Teleportacja gracza do określonego obiektu
+        if (teleportTarget != null)
+        {
+            transform.position = teleportTarget.transform.position;
+        }
+        else
+        {
+            Debug.LogWarning("Teleport target is not set.");
+        }
+
+        // Krótkie opóźnienie, aby gracz zobaczył efekt teleportacji (opcjonalne)
+        yield return new WaitForSeconds(0.1f);
+
+        // Ruch gracza po teleportacji
         Vector3 startPosition = transform.position;
         Vector3 targetPosition = startPosition + new Vector3(horizontalOffset, verticalOffset, 0);
         float elapsedTime = 0f;
@@ -38,10 +60,12 @@ public class Climbing_v3 : MonoBehaviour
             yield return null;
         }
 
-        transform.position = targetPosition; // Upewnienie się, że obiekt kończy ruch dokładnie w pozycji docelowej
+        // Upewnienie się, że obiekt kończy ruch dokładnie w pozycji docelowej
+        transform.position = targetPosition;
         Debug.Log("Movement completed");
+
+        // Włączenie sterowania graczem
         playerController.disabled = false;
+        animator.SetBool("IsClimbing", false);
     }
-    
-    
 }

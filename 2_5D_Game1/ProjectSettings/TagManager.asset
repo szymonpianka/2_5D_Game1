@@ -8,6 +8,7 @@ TagManager:
   - Coin
   - PullObject
   - Edge
+  - Ladder
   layers:
   - Default
   - TransparentFX
