@@ -9,6 +9,7 @@ TagManager:
   - PullObject
   - Edge
   - Ladder
+  - Wall
   layers:
   - Default
   - TransparentFX
