@@ -7,10 +7,8 @@ public class Climbing_left : MonoBehaviour
     public float moveDuration = 1.0f; // Czas w sekundach na przemieszczenie się
     public float horizontalOffset = 1.0f; // Wartość przesunięcia w bok
     public float verticalOffset = 1.0f; // Wartość przesunięcia w górę
-    public List<GameObject> triggerObjects; // Lista obiektów, które aktywują przesunięcie
-    public GameObject teleportTarget; // Obiekt, do którego gracz się teleportuje
+    public List<ClimbingPair> climbingPairs; // Lista par trigger/target
     private Animator animator;
-
     PlayerMovement playerController;
 
     // Start is called before the first frame update
@@ -22,23 +20,26 @@ public class Climbing_left : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // Sprawdzenie, czy IsFalling jest false w animatorze
-        if (!animator.GetBool("IsFalling") && triggerObjects.Contains(other.gameObject))
+        foreach (ClimbingPair pair in climbingPairs)
         {
-            animator.SetBool("IsClimbing", true);
-            StartCoroutine(TeleportAndMove());
+            if (pair.triggerObjects.Contains(other.gameObject) && !animator.GetBool("IsFalling"))
+            {
+                animator.SetBool("IsClimbing", true);
+                StartCoroutine(TeleportAndMove(pair.targetObject));
+                break;
+            }
         }
     }
 
-    IEnumerator TeleportAndMove()
+    IEnumerator TeleportAndMove(GameObject target)
     {
         // Wyłączenie sterowania graczem
         playerController.disabled = true;
 
         // Teleportacja gracza do określonego obiektu
-        if (teleportTarget != null)
+        if (target != null)
         {
-            transform.position = teleportTarget.transform.position;
+            transform.position = target.transform.position;
         }
         else
         {
