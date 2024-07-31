@@ -14,6 +14,9 @@ public class Crouch2Script : MonoBehaviour
     public bool isCrouching = false;
     private Animator animator;
 
+    public Collider blocker;
+    private bool isInBlocker = false;
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -34,14 +37,14 @@ public class Crouch2Script : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             animator.SetBool("IsCrawling", true);
-            Debug.Log("ISCrawling true");
+            Debug.Log("IsCrawling true");
             Crouch();
         }
 
         // Check if the left Ctrl key is released
-        if (Input.GetKeyUp(KeyCode.LeftControl))
+        if (Input.GetKeyUp(KeyCode.LeftControl) && !isInBlocker) // Modify this line
         {
-             animator.SetBool("IsCrawling", false);
+            animator.SetBool("IsCrawling", false);
             StandUp();
         }
     }
@@ -68,8 +71,25 @@ public class Crouch2Script : MonoBehaviour
         }
     }
 
-    
-    
+    void OnTriggerEnter(Collider other)
+    {
+        if (other == blocker)
+        {
+            isInBlocker = true;
+            // No automatic crouching when entering blocker
+        }
+    }
 
-   
+    void OnTriggerExit(Collider other)
+    {
+        if (other == blocker)
+        {
+            isInBlocker = false;
+            if (!Input.GetKey(KeyCode.LeftControl))
+            {
+                animator.SetBool("IsCrawling", false);
+                StandUp();
+            }
+        }
+    }
 }
