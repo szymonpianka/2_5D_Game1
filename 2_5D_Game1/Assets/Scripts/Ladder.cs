@@ -50,7 +50,7 @@ public class Ladder : MonoBehaviour
 
     void Update()
     {
-        if (nearLadder && Input.GetKeyDown(KeyCode.E))
+        if (nearLadder && Input.GetButtonDown("Interact"))
         {
             // Gracz wciśnie "E" będąc blisko drabiny
             inside = !inside; // Przełącz stan wspinania
@@ -66,14 +66,19 @@ public class Ladder : MonoBehaviour
             }
         }
 
-        if (inside && Input.GetKey("w"))
+        if (inside)
         {
-            characterController.transform.position += Vector3.up / speedUpDown;
-        }
+            // Ruch w górę za pomocą klawisza W lub joysticka
+            if (Input.GetKey("w") || Input.GetAxis("Vertical") > 0.9f)
+            {
+                characterController.transform.position += Vector3.up / speedUpDown;
+            }
 
-        if (inside && Input.GetKey("s"))
-        {
-            characterController.transform.position += Vector3.down / speedUpDown;
+            // Ruch w dół za pomocą klawisza S lub joysticka
+            if (Input.GetKey("s") || Input.GetAxis("Vertical") < -0.9f)
+            {
+                characterController.transform.position += Vector3.down / speedUpDown;
+            }
         }
     }
 }

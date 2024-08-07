@@ -25,7 +25,7 @@ public class PowerSwitch : MonoBehaviour
 
     void Update()
     {
-        if (isPlayerInTrigger && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerInTrigger && Input.GetButtonDown("Interact"))
         {
             PowerOn = true;
             Debug.Log("Power is ON");
