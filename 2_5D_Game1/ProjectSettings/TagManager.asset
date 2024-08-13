@@ -10,6 +10,7 @@ TagManager:
   - Edge
   - Ladder
   - Wall
+  - WheelChock
   layers:
   - Default
   - TransparentFX
