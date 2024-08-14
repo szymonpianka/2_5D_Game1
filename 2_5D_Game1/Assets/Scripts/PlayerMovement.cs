@@ -161,10 +161,30 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             Vector3 velocity = animator.deltaPosition;
-            velocity.y = ySpeed * Time.deltaTime;
+            velocity = AdjustVelocityToSlope(velocity);
+            velocity.y += ySpeed * Time.deltaTime;
 
             characterController.Move(velocity);
         }
+    }
+
+    private Vector3 AdjustVelocityToSlope(Vector3 velocity)
+    {
+        var ray = new Ray(transform.position, Vector3.down);
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, 0.2f))
+        {
+            var slopeRotation = Quaternion.FromToRotation(Vector3.up, hitInfo.normal);
+            var adjustedVelocity = slopeRotation * velocity;
+
+            if (adjustedVelocity.y < 0)
+            {
+                return adjustedVelocity;
+
+            }
+        }
+
+        return velocity;
+
     }
     
         
