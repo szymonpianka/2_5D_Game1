@@ -6,49 +6,56 @@ public class RampRotationScript : MonoBehaviour
 {
     public GameObject objectToRotate; // Obiekt, który ma się obracać
     public float rotationAngle = 90f; // Kąt obrotu w stopniach
-    public float rotationTime = 2f; // Czas trwania obrotu
-    private bool isPlayerInRange = false; // Czy gracz jest w zasięgu
-    private bool isRotated = false; // Czy obiekt jest obrócony
-    private bool isRotating = false; // Czy obiekt aktualnie się obraca
-    private Coroutine currentRotationCoroutine = null; // Referencja do aktualnie działającej korutyny
+    public float rotationSpeed = 30f; // Prędkość rotacji w stopniach na sekundę
+    public PowerSwitchFRScript powerSwitch; // Odwołanie do skryptu PowerSwitchFRScript
 
-    // Globalne wartości rotacji
-    private Quaternion startRotation; // Początkowa rotacja
-    private Quaternion targetRotation; // Docelowa rotacja
+    private bool isPlayerInRange = false; // Czy gracz jest w zasięgu
+    private bool isRotatedToSecondPoint = false; // Czy obiekt jest obrócony do drugiego punktu rotacji
+    private bool isRotating = false; // Czy obiekt aktualnie się obraca
+    private Quaternion firstRotation; // Początkowa rotacja obiektu (pierwszy punkt)
+    private Quaternion secondRotation; // Docelowa rotacja obiektu (drugi punkt)
+
+    void Start()
+    {
+        // Zapisz początkową rotację obiektu jako pierwszy punkt rotacji
+        firstRotation = objectToRotate.transform.rotation;
+
+        // Ustal drugi punkt rotacji jako sumę początkowej rotacji i kąta z inspektora
+        secondRotation = firstRotation * Quaternion.Euler(0, 0, rotationAngle);
+    }
 
     void Update()
     {
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E) && !isRotating)
+        // Sprawdź, czy gracz jest w zasięgu, przycisk E został naciśnięty, obiekt nie jest już w ruchu, i czy PowerFROn jest true
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E) && !isRotating && powerSwitch != null && powerSwitch.PowerFROn)
         {
-            if (isRotated)
+            if (isRotatedToSecondPoint)
             {
-                currentRotationCoroutine = StartCoroutine(RotateObject(-rotationAngle)); // Obróć w przeciwną stronę
+                StartCoroutine(RotateObject(firstRotation)); // Obróć do pierwszego punktu
             }
             else
             {
-                currentRotationCoroutine = StartCoroutine(RotateObject(rotationAngle)); // Obróć o zadany kąt
+                StartCoroutine(RotateObject(secondRotation)); // Obróć do drugiego punktu
             }
-            isRotated = !isRotated; // Zmień stan obrotu
+            isRotatedToSecondPoint = !isRotatedToSecondPoint; // Zmień stan rotacji
         }
     }
 
-    private IEnumerator RotateObject(float angle)
+    private IEnumerator RotateObject(Quaternion targetRotation)
     {
         isRotating = true; // Ustaw flagę, że obiekt się obraca
-        startRotation = objectToRotate.transform.rotation;
-
-        // Ustaw docelową rotację na podstawie aktualnej rotacji
-        targetRotation = startRotation * Quaternion.Euler(0, 0, angle);
-
+        Quaternion startRotation = objectToRotate.transform.rotation;
+        
+        // Oblicz kąt między obecną rotacją a docelową rotacją
+        float angleDifference = Quaternion.Angle(startRotation, targetRotation);
+        
+        // Oblicz czas na podstawie kąta i prędkości
+        float rotationTime = angleDifference / rotationSpeed;
+        
         float elapsedTime = 0f;
 
         while (elapsedTime < rotationTime)
         {
-            if (!isRotating)
-            {
-                yield break; // Jeśli rotacja została zatrzymana, zakończ korutynę
-            }
-
             float t = elapsedTime / rotationTime;
             objectToRotate.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
             elapsedTime += Time.deltaTime;
@@ -58,16 +65,14 @@ public class RampRotationScript : MonoBehaviour
         // Ustaw rotację na końcowy stan
         objectToRotate.transform.rotation = targetRotation;
         isRotating = false; // Zresetuj flagę po zakończeniu obrotu
-        currentRotationCoroutine = null;
     }
 
     public void StopRotation()
     {
-        if (currentRotationCoroutine != null)
+        if (isRotating)
         {
-            StopCoroutine(currentRotationCoroutine); // Zatrzymaj aktualną korutynę
-            isRotating = false; // Ustaw flagę, że obiekt przestał się obracać
-            currentRotationCoroutine = null;
+            StopAllCoroutines(); // Zatrzymaj aktualną korutynę
+            isRotating = false; // Zresetuj flagę po zatrzymaniu rotacji
         }
     }
 
@@ -86,6 +91,7 @@ public class RampRotationScript : MonoBehaviour
             isPlayerInRange = false;
         }
     }
+    
     
     
     
