@@ -11,6 +11,7 @@ TagManager:
   - Ladder
   - Wall
   - WheelChock
+  - BlokadaKucania
   layers:
   - Default
   - TransparentFX

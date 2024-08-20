@@ -14,7 +14,6 @@ public class Crouch2Script : MonoBehaviour
     public bool isCrouching = false;
     private Animator animator;
 
-    public Collider blocker;
     private bool isInBlocker = false;
 
     void Start()
@@ -42,7 +41,7 @@ public class Crouch2Script : MonoBehaviour
         }
 
         // Check if the left Ctrl key is released
-        if (Input.GetKeyUp(KeyCode.LeftControl) && !isInBlocker) // Modify this line
+        if (Input.GetKeyUp(KeyCode.LeftControl) && !isInBlocker)
         {
             animator.SetBool("IsCrawling", false);
             StandUp();
@@ -73,7 +72,7 @@ public class Crouch2Script : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other == blocker)
+        if (other.CompareTag("BlokadaKucania"))
         {
             isInBlocker = true;
             // No automatic crouching when entering blocker
@@ -82,7 +81,7 @@ public class Crouch2Script : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other == blocker)
+        if (other.CompareTag("BlokadaKucania"))
         {
             isInBlocker = false;
             if (!Input.GetKey(KeyCode.LeftControl))
@@ -92,5 +91,6 @@ public class Crouch2Script : MonoBehaviour
             }
         }
     }
+    
     
 }

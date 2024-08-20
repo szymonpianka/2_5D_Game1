@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
     private float originalStepOffset;
     private float? lastGroundedTime;
     private float? jumpButtonPressedTime;
-    private bool isJumping;
+    public bool isJumping;
     private bool isGrounded;
 
     [SerializeField]
