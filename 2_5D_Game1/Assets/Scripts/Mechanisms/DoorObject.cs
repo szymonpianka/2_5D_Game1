@@ -13,16 +13,16 @@ public class DoorObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PullObject"))
+        if (other.CompareTag("DoorBlockade"))
         {
-            Debug.Log("PullObjectTouched");
+            Debug.Log("DoorBlockadeTouched");
             leverScript.SetPaused(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("PullObject"))
+        if (other.CompareTag("DoorBlockade"))
         {
             leverScript.SetPaused(false);
         }

@@ -12,6 +12,9 @@ TagManager:
   - Wall
   - WheelChock
   - BlokadaKucania
+  - ClimbingTrigger
+  - ClimbingTriggerLeft
+  - DoorBlockade
   layers:
   - Default
   - TransparentFX

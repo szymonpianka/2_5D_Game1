@@ -7,11 +7,11 @@ public class Climbing_left : MonoBehaviour
     public float moveDuration = 1.0f; // Czas w sekundach na przemieszczenie się
     public float horizontalOffset = 1.0f; // Wartość przesunięcia w bok
     public float verticalOffset = 1.0f; // Wartość przesunięcia w górę
-    public List<ClimbingPair> climbingPairs; // Lista par trigger/target
-    private Animator animator;
-    PlayerMovement playerController;
+    public Vector3 climbBeginOffset; // Offset punktu początkowego wspinaczki względem obiektu, na którym jest skrypt
 
-    // Start is called before the first frame update
+    private Animator animator;
+    private PlayerMovement playerController;
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -20,53 +20,45 @@ public class Climbing_left : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        foreach (ClimbingPair pair in climbingPairs)
+        // Sprawdzenie, czy gracz dotyka triggera z tagiem "ClimbingTriggerLeft" i nie jest w trakcie spadania
+        if (other.CompareTag("ClimbingTriggerLeft") && !animator.GetBool("IsFalling"))
         {
-            if (pair.triggerObjects.Contains(other.gameObject) && !animator.GetBool("IsFalling"))
-            {
-                animator.SetBool("IsClimbing", true);
-                StartCoroutine(TeleportAndMove(pair.targetObject));
-                break;
-            }
+            animator.SetBool("IsClimbing", true);
+            StartCoroutine(TeleportAndMove());
         }
     }
 
-    IEnumerator TeleportAndMove(GameObject target)
+    IEnumerator TeleportAndMove()
     {
         // Wyłączenie sterowania graczem
         playerController.disabled = true;
 
-        // Teleportacja gracza do określonego obiektu
-        if (target != null)
-        {
-            transform.position = target.transform.position;
-        }
-        else
-        {
-            Debug.LogWarning("Teleport target is not set.");
-        }
+        // Teleportacja gracza na podstawie offsetu względem pozycji obiektu, na którym jest skrypt
+        Vector3 targetPosition = transform.position + transform.TransformVector(climbBeginOffset);
+        playerController.transform.position = targetPosition;
 
         // Krótkie opóźnienie, aby gracz zobaczył efekt teleportacji (opcjonalne)
         yield return new WaitForSeconds(0.1f);
 
         // Ruch gracza po teleportacji
-        Vector3 startPosition = transform.position;
-        Vector3 targetPosition = startPosition + new Vector3(horizontalOffset, verticalOffset, 0);
+        Vector3 startPosition = playerController.transform.position;
+        Vector3 finalPosition = startPosition + new Vector3(horizontalOffset, verticalOffset, 0);
         float elapsedTime = 0f;
 
         while (elapsedTime < moveDuration)
         {
-            transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / moveDuration);
+            playerController.transform.position = Vector3.Lerp(startPosition, finalPosition, elapsedTime / moveDuration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         // Upewnienie się, że obiekt kończy ruch dokładnie w pozycji docelowej
-        transform.position = targetPosition;
+        playerController.transform.position = finalPosition;
         Debug.Log("Movement completed");
 
         // Włączenie sterowania graczem
         playerController.disabled = false;
         animator.SetBool("IsClimbing", false);
     }
+    
 }
