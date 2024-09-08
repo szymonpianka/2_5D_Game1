@@ -380,6 +380,7 @@
 "Assets/Scripts/DragObjectScript.cs"
 "Assets/Scripts/FinishLevel.cs"
 "Assets/Scripts/Ladder.cs"
+"Assets/Scripts/Mechanisms/AnimPlayDelayScript.cs"
 "Assets/Scripts/Mechanisms/BridgePart.cs"
 "Assets/Scripts/Mechanisms/ButtonAnimScript.cs"
 "Assets/Scripts/Mechanisms/Cart.cs"
