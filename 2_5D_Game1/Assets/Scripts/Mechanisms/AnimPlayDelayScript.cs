@@ -13,23 +13,42 @@ public class AnimPlayDelayScript : MonoBehaviour
     }
 
     public List<AnimatorAction> animatorActions; // Lista akcji animatora
+    public bool requireKeyPress = true;          // Czy wymagane jest wciśnięcie klawisza E?
+    public KeyCode activationKey = KeyCode.E;    // Klawisz aktywacji, jeśli requireKeyPress jest true
+
     private bool isPlayerInRange = false;        // Czy gracz jest w zasięgu?
     private Coroutine currentSequenceCoroutine;
 
     void Update()
     {
-        // Sprawdzenie, czy gracz jest w zasięgu i czy naciśnięto klawisz E
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
+        if (requireKeyPress)
         {
-            // Jeśli korutyna już działa, zatrzymaj ją
-            if (currentSequenceCoroutine != null)
+            // Sprawdzenie, czy gracz jest w zasięgu i czy naciśnięto klawisz aktywacji
+            if (isPlayerInRange && Input.GetKeyDown(activationKey))
             {
-                StopCoroutine(currentSequenceCoroutine);
+                StartSequence();
             }
-
-            // Rozpocznij nową sekwencję akcji
-            currentSequenceCoroutine = StartCoroutine(ExecuteAnimatorSequence());
         }
+        else
+        {
+            // Jeśli nie wymagane jest wciśnięcie klawisza
+            if (isPlayerInRange)
+            {
+                StartSequence();
+            }
+        }
+    }
+
+    private void StartSequence()
+    {
+        // Jeśli korutyna już działa, zatrzymaj ją
+        if (currentSequenceCoroutine != null)
+        {
+            StopCoroutine(currentSequenceCoroutine);
+        }
+
+        // Rozpocznij nową sekwencję akcji
+        currentSequenceCoroutine = StartCoroutine(ExecuteAnimatorSequence());
     }
 
     private IEnumerator ExecuteAnimatorSequence()
@@ -61,6 +80,5 @@ public class AnimPlayDelayScript : MonoBehaviour
             isPlayerInRange = false;
         }
     }
-    
     
 }
